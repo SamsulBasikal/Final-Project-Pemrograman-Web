@@ -1,50 +1,30 @@
 import React, { useState } from "react";
 import { auth, googleProvider } from "./firebase";
-import { createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { useNavigate, Link } from "react-router-dom";
 
-const Register = () => {
+const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [pesan, setPesan] = useState({ text: "", type: "" });
-  
   const navigate = useNavigate();
 
-  const handleRegisterEmail = async (e) => {
+  const handleLoginEmail = async (e) => {
     e.preventDefault();
     setPesan({ text: "", type: "" });
-
-    if (password !== confirmPassword) {
-      return setPesan({ text: "Password dan Konfirmasi Password tidak sama", type: "error" });
-    }
-
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      setPesan({ text: "Akun berhasil dibuat Mengalihkan ke halaman Login...", type: "success" });
-      setEmail("");
-      setPassword("");
-      setConfirmPassword("");
-      
-      setTimeout(() => {
-        navigate("/login");
-      }, 2000);
-      
+      await signInWithEmailAndPassword(auth, email, password);
+      setPesan({ text: "Berhasil Login", type: "success" });
     } catch (error) {
-      setPesan({ text: `Gagal mendaftar: ${error.message}`, type: "error" });
+      setPesan({ text: "Email atau Password salah", type: "error" });
     }
   };
 
-  const handleRegisterGoogle = async () => {
+  const handleLoginGoogle = async () => {
     setPesan({ text: "", type: "" });
     try {
       await signInWithPopup(auth, googleProvider);
       setPesan({ text: "Berhasil masuk dengan Google", type: "success" });
-      
-      setTimeout(() => {
-        navigate("/login");
-      }, 1500);
-
     } catch (error) {
       setPesan({ text: `Gagal masuk: ${error.message}`, type: "error" });
     }
@@ -143,36 +123,31 @@ const Register = () => {
   return (
     <div style={styles.container}>
       <div style={styles.card}>
-        <h2 style={{ marginBottom: "20px", color: "#333", fontWeight: "800" }}>Buat Akun Baru</h2>
+        <h2 style={{ marginBottom: "20px", color: "#333", fontWeight: "800" }}>Login</h2>
         
         {pesan.text && <div style={styles.msg}>{pesan.text}</div>}
 
-        <form onSubmit={handleRegisterEmail}>
+        <form onSubmit={handleLoginEmail}>
           <input type="email" placeholder="Masukkan Email" style={styles.input} value={email} onChange={(e) => setEmail(e.target.value)} required />
-          <input type="password" placeholder="Password (min. 6 karakter)" style={styles.input} value={password} onChange={(e) => setPassword(e.target.value)} required />
-          <input type="password" placeholder="Konfirmasi Password" style={styles.input} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
-          
-          <button type="submit" style={styles.btnEmail}>Daftar</button>
+          <input type="password" placeholder="Password" style={styles.input} value={password} onChange={(e) => setPassword(e.target.value)} required />
+          <button type="submit" style={styles.btnEmail}>Masuk</button>
         </form>
 
         <div style={styles.divider}>
-          <div style={styles.line}></div>
-          <span>ATAU</span>
-          <div style={styles.line}></div>
+          <div style={styles.line}></div><span>ATAU</span><div style={styles.line}></div>
         </div>
 
-        <button onClick={handleRegisterGoogle} style={styles.btnGoogle}>
+        <button onClick={handleLoginGoogle} style={styles.btnGoogle}>
           <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google Logo" style={{ width: "20px" }} />
-          Daftar dengan Google
+          Masuk dengan Google
         </button>
 
         <p style={styles.linkText}>
-          Sudah punya akun? <Link to="/login" style={{ color: "#3b82f6", textDecoration: "none", fontWeight: "bold" }}>Masuk di sini</Link>
+          Belum punya akun? <Link to="/register" style={{ color: "#3b82f6", textDecoration: "none", fontWeight: "bold" }}>Daftar di sini</Link>
         </p>
-
       </div>
     </div>
   );
 };
 
-export default Register;
+export default Login;

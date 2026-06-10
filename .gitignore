@@ -24,3 +24,8 @@ dist-ssr
 *.sw?
 
 .env
+
+# Firebase Cache & AI Agents
+.firebase/
+.agents/
+skills-lock.json
