@@ -1,149 +1,102 @@
-import React, { useState } from "react";
-import { auth, googleProvider } from "./firebase";
-import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
-import { useNavigate, Link } from "react-router-dom";
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
+import { auth, googleProvider } from './firebase';
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [pesan, setPesan] = useState({ text: "", type: "" });
   const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
 
-  const handleLoginEmail = async (e) => {
+  const handleEmailLogin = async (e) => {
     e.preventDefault();
-    setPesan({ text: "", type: "" });
+    setErrorMsg('');
+    setSuccessMsg('');
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      setPesan({ text: "Berhasil Login", type: "success" });
+      setSuccessMsg('Berhasil masuk! Mengalihkan...');
+      setTimeout(() => navigate('/dashboard'), 1000);
     } catch (error) {
-      setPesan({ text: "Email atau Password salah", type: "error" });
+      setErrorMsg('Gagal masuk: ' + error.message);
     }
   };
 
-  const handleLoginGoogle = async () => {
-    setPesan({ text: "", type: "" });
+  const handleGoogleLogin = async () => {
+    setErrorMsg('');
+    setSuccessMsg('');
     try {
       await signInWithPopup(auth, googleProvider);
-      setPesan({ text: "Berhasil masuk dengan Google", type: "success" });
+      setSuccessMsg('Berhasil masuk dengan Google! Mengalihkan...');
+      // Tunggu 1 detik lalu pindah ke Dashboard
+      setTimeout(() => navigate('/dashboard'), 1000);
     } catch (error) {
-      setPesan({ text: `Gagal masuk: ${error.message}`, type: "error" });
-    }
-  };
-
-  const styles = {
-    container: { 
-      minHeight: "100vh", 
-      display: "flex", 
-      alignItems: "center", 
-      justifyContent: "center", 
-      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", 
-      padding: "20px",
-      fontFamily: "'Inter', sans-serif"
-    },
-    card: { 
-      backgroundColor: "white", 
-      padding: "45px 40px", 
-      borderRadius: "15px", 
-      boxShadow: "0 10px 25px rgba(0,0,0,0.2)", 
-      width: "100%", 
-      maxWidth: "400px", 
-      textAlign: "center" 
-    },
-    input: { 
-      width: "100%", 
-      padding: "14px", 
-      margin: "10px 0", 
-      border: "1px solid #e2e8f0", 
-      borderRadius: "8px", 
-      boxSizing: "border-box",
-      backgroundColor: "#f8fafc",
-      color: "#333",
-      fontSize: "14px",
-      outline: "none"
-    },
-    btnEmail: { 
-      width: "100%", 
-      padding: "14px", 
-      backgroundColor: "#3b82f6", 
-      color: "white", 
-      border: "none", 
-      borderRadius: "8px", 
-      cursor: "pointer", 
-      fontWeight: "bold", 
-      fontSize: "16px", 
-      marginTop: "15px",
-      transition: "0.3s"
-    },
-    btnGoogle: { 
-      width: "100%", 
-      padding: "12px", 
-      backgroundColor: "white", 
-      color: "#475569", 
-      border: "1px solid #cbd5e1", 
-      borderRadius: "8px", 
-      cursor: "pointer", 
-      fontWeight: "bold", 
-      fontSize: "15px", 
-      marginTop: "15px", 
-      display: "flex", 
-      alignItems: "center", 
-      justifyContent: "center", 
-      gap: "10px",
-      boxShadow: "0 1px 2px rgba(0,0,0,0.05)"
-    },
-    divider: { 
-      margin: "25px 0", 
-      color: "#94a3b8", 
-      fontSize: "14px", 
-      display: "flex", 
-      alignItems: "center" 
-    },
-    line: { 
-      flex: 1, 
-      height: "1px", 
-      backgroundColor: "#e2e8f0", 
-      margin: "0 10px" 
-    },
-    msg: { 
-      padding: "12px", 
-      borderRadius: "8px", 
-      marginBottom: "20px", 
-      fontSize: "14px", 
-      backgroundColor: pesan.type === "error" ? "#fee2e2" : "#dcfce7", 
-      color: pesan.type === "error" ? "#991b1b" : "#166534",
-      fontWeight: "500"
-    },
-    linkText: { 
-      marginTop: "25px", 
-      fontSize: "14px", 
-      color: "#64748b" 
+      setErrorMsg('Gagal masuk: ' + error.message);
     }
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        <h2 style={{ marginBottom: "20px", color: "#333", fontWeight: "800" }}>Login</h2>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-700 p-4 font-['Plus_Jakarta_Sans']">
+      <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
+        <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Login</h2>
         
-        {pesan.text && <div style={styles.msg}>{pesan.text}</div>}
+        {successMsg && (
+          <div className="bg-green-100 text-green-700 p-3 rounded-lg text-sm mb-4 text-center font-medium">
+            {successMsg}
+          </div>
+        )}
+        {errorMsg && (
+          <div className="bg-red-100 text-red-700 p-3 rounded-lg text-sm mb-4 text-center font-medium">
+            {errorMsg}
+          </div>
+        )}
 
-        <form onSubmit={handleLoginEmail}>
-          <input type="email" placeholder="Masukkan Email" style={styles.input} value={email} onChange={(e) => setEmail(e.target.value)} required />
-          <input type="password" placeholder="Password" style={styles.input} value={password} onChange={(e) => setPassword(e.target.value)} required />
-          <button type="submit" style={styles.btnEmail}>Masuk</button>
+        <form onSubmit={handleEmailLogin} className="space-y-4">
+          <div>
+            <input 
+              type="email" 
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Masukkan Email" 
+              required
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+            />
+          </div>
+          <div>
+            <input 
+              type="password" 
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password" 
+              required
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+            />
+          </div>
+          <button 
+            type="submit" 
+            className="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition-all shadow-md active:scale-95"
+          >
+            Masuk
+          </button>
         </form>
 
-        <div style={styles.divider}>
-          <div style={styles.line}></div><span>ATAU</span><div style={styles.line}></div>
+        <div className="my-6 flex items-center justify-center gap-3">
+          <div className="h-px bg-gray-300 flex-1"></div>
+          <span className="text-gray-400 text-xs font-semibold tracking-wider">ATAU</span>
+          <div className="h-px bg-gray-300 flex-1"></div>
         </div>
 
-        <button onClick={handleLoginGoogle} style={styles.btnGoogle}>
-          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google Logo" style={{ width: "20px" }} />
+        <button 
+          onClick={handleGoogleLogin}
+          className="w-full bg-white border border-gray-300 text-gray-700 font-bold py-3 rounded-lg hover:bg-gray-50 transition-all flex items-center justify-center gap-2 shadow-sm active:scale-95"
+        >
+          <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5" />
           Masuk dengan Google
         </button>
 
-        <p style={styles.linkText}>
-          Belum punya akun? <Link to="/register" style={{ color: "#3b82f6", textDecoration: "none", fontWeight: "bold" }}>Daftar di sini</Link>
+        <p className="text-center text-sm text-gray-600 mt-6">
+          Belum punya akun? <Link to="/register" className="text-blue-600 font-bold hover:underline">Daftar di sini</Link>
         </p>
       </div>
     </div>

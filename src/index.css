@@ -1,10 +1,35 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@import "tailwindcss";
+
+@theme {
+  --color-surface: #f7f9fb;
+  --color-primary: #0058be;
+  --color-secondary: #6b38d4;
+  --color-tertiary: #765700;
+  --color-surface-container: #eceef0;
+  --color-surface-container-low: #f2f4f6;
+  --color-surface-container-lowest: #ffffff;
+  --color-error: #ba1a1a;
+  --color-outline-variant: #c2c6d6;
+  --color-primary-container: #2170e4;
+  --color-on-surface: #191c1e;
 }
 
-body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background-color: #f3f4f6;
+body { 
+  font-family: 'Plus Jakarta Sans', sans-serif; 
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  display: inline-block;
+  line-height: 1;
+}
+
+.bg-vibrant-gradient {
+  background: linear-gradient(135deg, #0058be 0%, #6b38d4 50%, #765700 100%);
 }

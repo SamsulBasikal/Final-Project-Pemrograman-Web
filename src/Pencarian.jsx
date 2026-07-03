@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Layout from './layout';
+import Layout from './Layout';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { db, auth } from './firebase';
 

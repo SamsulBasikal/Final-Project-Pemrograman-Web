@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from './Layout';
-import { collection, onSnapshot, query, orderBy, doc, deleteDoc } from 'firebase/firestore';
+// HAPUS deleteDoc, GANTI JADI updateDoc
+import { collection, onSnapshot, query, orderBy, doc, updateDoc } from 'firebase/firestore';
 import { db, auth } from './firebase';
 
 const Dashboard = () => {
@@ -27,7 +28,6 @@ const Dashboard = () => {
   }, []);
 
   const handleChat = (idPemilik, namaBarang) => {
-    // Cegah user nge-chat dirinya sendiri
     if (idPemilik === currentUserUid) {
       alert("Ini laporan kamu sendiri lho!");
       return;
@@ -35,15 +35,19 @@ const Dashboard = () => {
     navigate(`/chat/${idPemilik}`, { state: { namaBarang } });
   };
 
+  // LOGIKA BARU: UPDATE STATUS, BUKAN HAPUS DATA
   const handleSelesai = async (idLaporan) => {
-    const yakin = window.confirm("Apakah barang ini sudah kembali/selesai? Laporan akan dihapus dari publik.");
+    const yakin = window.confirm("Apakah barang ini sudah kembali/selesai? Status akan diubah menjadi 'DITEMUKAN'.");
     if (yakin) {
       try {
-        await deleteDoc(doc(db, 'laporan', idLaporan));
-        alert("Mantap! Laporan berhasil diselesaikan dan di-takedown.");
+        // Kita cuma mengubah field 'status' menjadi 'ditemukan'
+        await updateDoc(doc(db, 'laporan', idLaporan), {
+          status: 'ditemukan'
+        });
+        alert("Mantap! Status barang berhasil diperbarui.");
       } catch (error) {
-        console.error("Gagal menghapus laporan:", error);
-        alert("Gagal menyelesaikan laporan.");
+        console.error("Gagal mengupdate laporan:", error);
+        alert("Gagal mengubah status laporan.");
       }
     }
   };
@@ -75,7 +79,6 @@ const Dashboard = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {laporanList.map((barang) => {
-              // CEK APAKAH INI BARANG MILIK USER YANG SEDANG LOGIN
               const milikSaya = barang.pemilikId === currentUserUid;
 
               return (
@@ -107,12 +110,21 @@ const Dashboard = () => {
                       {barang.deskripsi}
                     </p>
                     
+                    {/* LOGIKA TOMBOL YANG SUDAH DIPERBARUI */}
                     {milikSaya ? (
-                      <button 
-                        onClick={() => handleSelesai(barang.id)}
-                        className="w-full py-2.5 bg-green-500 text-white rounded-xl font-bold hover:bg-green-600 transition-all flex items-center justify-center gap-2 shadow-md mt-auto">
-                        <span className="material-symbols-outlined text-sm">check_circle</span> Tandai Selesai
-                      </button>
+                      barang.status === 'hilang' ? (
+                        <button 
+                          onClick={() => handleSelesai(barang.id)}
+                          className="w-full py-2.5 bg-green-500 text-white rounded-xl font-bold hover:bg-green-600 transition-all flex items-center justify-center gap-2 shadow-md mt-auto">
+                          <span className="material-symbols-outlined text-sm">check_circle</span> Tandai Selesai
+                        </button>
+                      ) : (
+                        <button 
+                          disabled
+                          className="w-full py-2.5 bg-gray-100 text-gray-400 rounded-xl font-bold flex items-center justify-center gap-2 mt-auto cursor-not-allowed">
+                          <span className="material-symbols-outlined text-sm">task_alt</span> Sudah Ditemukan
+                        </button>
+                      )
                     ) : (
                       <button 
                         onClick={() => handleChat(barang.pemilikId, barang.namaBarang)}
