@@ -1,4 +1,4 @@
-# TEMORA (Temukan Barang Bersama)
+# TEMORA (Temukan Online Barang Hilnag)
 
 ## Deskripsi
 TEMORA (Temukan Barang Bersama) merupakan website Lost and Found yang dikembangkan untuk membantu mahasiswa melaporkan barang hilang maupun barang ditemukan di lingkungan kampus. Website ini memudahkan pengguna dalam mencari informasi barang, membuat laporan baru, serta berkomunikasi dengan pengguna lain melalui fitur pesan.
